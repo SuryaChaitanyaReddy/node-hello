@@ -1,0 +1,34 @@
+pipeline {
+    agent any
+
+    tools {
+        // Install the Nodejs version configured as "nodejs" and add it to the path.
+        nodejs "nodejs"
+    }
+
+    stages {
+        stage('Build') {
+            steps {
+                // Get some code from a GitHub repository
+                git 'https://github.com/SuryaChaitanyaReddy/node-hello.git'
+
+                // Run Maven on a Unix agent.
+                sh "npm install"
+            }
+        }
+        stage('dockerbuild') {
+            steps {
+                sh "docker build . -t suryachaitanyareddy/nodehello:${BUILD_NUMBER}"
+            }
+        }
+        stage('dockerpush') {
+            steps {
+                script {
+                    withDockerRegistry(credentialsId: 'dockerregistry') {
+                        sh "docker push suryachaitanyareddy/nodehello:${BUILD_NUMBER}"
+                    }
+                }      
+            }    
+        }    
+    }
+}
