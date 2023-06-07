@@ -28,7 +28,14 @@ pipeline {
                         sh "docker push suryachaitanyareddy/nodehello:${BUILD_NUMBER}"
                     }
                 }      
-            }    
-        }    
-    }
+            } 
+         }
+       stage('deployment to Eks') {
+           steps {
+           sh "sed -i 's/BUILD_NUMBER/${BUILD_NUMBER}/g' cd/deployment.yaml"
+           sh 'kubectl apply -f cd/deployment.yaml'
+           
+           }
+       }
+   }
 }
